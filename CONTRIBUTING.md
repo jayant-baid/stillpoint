@@ -12,10 +12,13 @@ Thanks for helping. You don't need to write code to contribute. These are all us
 This app holds powerful permissions, so these aren't up for negotiation in a pull request:
 
 1. **No internet access.** The `INTERNET` permission stays removed, and no feature may need it.
-2. **No reading screen content.** `canRetrieveWindowContent` stays off.
+2. **No accessibility service, and no reading screen content.** Banking and UPI apps treat that
+   permission as a fraud risk, and Paytm refused to run alongside it.
 3. **`WRITE_SECURE_SETTINGS` is used only for the colour filter.**
 4. **Nothing new is exported** without a clear reason explained in the pull request.
-5. **New permissions and dependencies need a justification** in the pull request. Fewer is better.
+5. **No hiding from other apps' security checks.** If a payment app objects to Stillpoint, the fix
+   is to need less access, never to disguise it.
+6. **New permissions and dependencies need a justification** in the pull request. Fewer is better.
 
 ## Building and testing
 
@@ -42,7 +45,7 @@ phone and Android version you used.
 |---|---|
 | `core/` | Limit rules, reset time logic, saved format. Pure Kotlin, covered by unit tests |
 | `data/` | Saved state and the installed app list |
-| `service/` | Accessibility service, grayscale switching and the stop screen |
+| `service/` | Foreground app detection, grayscale switching and the stop screen |
 | `ui/` | Compose screens and the design system |
 
 ## Design
@@ -52,10 +55,8 @@ is running out or has run out. Please keep it that way, and avoid decorative ani
 
 ## Testing pitfalls
 
-- **`uiautomator dump` disconnects accessibility services** each time it runs, so time won't count
-  properly if you run it during a timed test. Use `adb exec-out screencap` instead.
 - **Screenshots don't show the grayscale filter.** Check it by eye, or read
   `adb shell settings get secure accessibility_display_daltonizer_enabled`.
-- **`pm clear` turns the accessibility service off,** so you have to turn it back on afterwards.
+- **Try a payment app** if your change touches permissions, and say which one in your pull request.
 
 By contributing, you agree that your work is released under the [GPL-3.0](LICENSE).

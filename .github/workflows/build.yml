@@ -20,10 +20,11 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - name: Run unit tests and build
         run: ./gradlew testDebugUnitTest assembleDebug
-      - name: Fail if the app gains internet access
+      - name: Fail if the app gains internet or accessibility access
         run: |
           MANIFEST=$(find app/build/intermediates -name AndroidManifest.xml -path '*debug*' | head -1)
-          if grep -q 'android.permission.INTERNET' "$MANIFEST"; then
-            echo "The INTERNET permission must stay removed. See CONTRIBUTING.md." >&2
+          test -n "$MANIFEST"
+          if grep -qE 'android.permission.INTERNET|BIND_ACCESSIBILITY_SERVICE' "$MANIFEST"; then
+            echo "Internet and accessibility access must stay out. See CONTRIBUTING.md." >&2
             exit 1
           fi

@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.ComponentActivity
@@ -43,6 +44,7 @@ import com.stillpoint.app.data.InstalledApp
 import com.stillpoint.app.data.Store
 import com.stillpoint.app.service.GrayscaleController
 import com.stillpoint.app.service.StillpointService
+import com.stillpoint.app.service.hasUsageAccess
 import com.stillpoint.app.ui.GRANT_COMMAND
 import com.stillpoint.app.ui.GrayscaleScreen
 import com.stillpoint.app.ui.GroupsScreen
@@ -71,7 +73,8 @@ class MainActivity : ComponentActivity() {
 }
 
 private fun readSetup(context: Context) = SetupState(
-    serviceOn = StillpointService.isEnabled(context),
+    usageAccess = hasUsageAccess(context),
+    canShowStopScreen = Settings.canDrawOverlays(context),
     grayscaleAllowed = GrayscaleController.isPermitted(context),
     developerOptionsOn = Settings.Global.getInt(
         context.contentResolver,
@@ -89,6 +92,7 @@ private fun Root() {
     var setup by remember { mutableStateOf(readSetup(context)) }
     LifecycleResumeEffect(Unit) {
         setup = readSetup(context)
+        StillpointService.start(context)
         onPauseOrDispose { }
     }
 
@@ -108,7 +112,7 @@ private fun Root() {
     ) {
         val nudge = when {
             tab == Tab.Settings -> null
-            !setup.serviceOn -> "Limits and grayscale are off. Finish setup"
+            !setup.usageAccess || !setup.canShowStopScreen -> "Limits and grayscale are off. Finish setup"
             tab == Tab.Gray && !setup.grayscaleAllowed -> "Grayscale needs one more step"
             else -> null
         }
@@ -125,8 +129,16 @@ private fun Root() {
                     usage = usage,
                     versionName = context.packageManager
                         .getPackageInfo(context.packageName, 0).versionName.orEmpty(),
-                    onOpenAccessibility = {
-                        context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                    onOpenUsageAccess = {
+                        context.startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
+                    },
+                    onOpenDisplayOver = {
+                        context.startActivity(
+                            Intent(
+                                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                Uri.parse("package:${context.packageName}"),
+                            ),
+                        )
                     },
                     onOpenDeveloperOptions = {
                         context.startActivity(Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS))

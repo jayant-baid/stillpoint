@@ -12,6 +12,6 @@ object BlockGate {
 
     val current = MutableStateFlow<Info?>(null)
 
-    /** True from the moment the screen is requested until it is destroyed. */
+    /** True while the stop screen exists. */
     var screenAlive = false
 }

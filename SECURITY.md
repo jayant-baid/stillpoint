@@ -1,6 +1,6 @@
 # Security
 
-Stillpoint holds an accessibility service and `WRITE_SECURE_SETTINGS`, so security reports matter.
+Stillpoint holds Usage access and, optionally, `WRITE_SECURE_SETTINGS`, so security reports matter.
 
 Please don't open a public issue for a vulnerability. Use **Security > Report a vulnerability** on
 this repository's GitHub page to report it privately.

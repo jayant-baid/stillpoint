@@ -36,7 +36,8 @@ import com.stillpoint.app.core.formatResetTime
 import com.stillpoint.app.data.Store
 
 data class SetupState(
-    val serviceOn: Boolean,
+    val usageAccess: Boolean,
+    val canShowStopScreen: Boolean,
     val grayscaleAllowed: Boolean,
     val developerOptionsOn: Boolean,
 )
@@ -54,7 +55,8 @@ fun SettingsScreen(
     config: Config,
     usage: Map<String, Long>,
     versionName: String,
-    onOpenAccessibility: () -> Unit,
+    onOpenUsageAccess: () -> Unit,
+    onOpenDisplayOver: () -> Unit,
     onOpenDeveloperOptions: () -> Unit,
     onCopyCommand: () -> Unit,
 ) {
@@ -67,17 +69,25 @@ fun SettingsScreen(
         item {
             SetupStep(
                 number = 1,
-                title = "App detection",
-                done = setup.serviceOn,
-                body = "Needed for limits and grayscale. Find Stillpoint in the list, sometimes under Downloaded apps, and turn it on.",
-            ) { TextAction("Open accessibility settings", onOpenAccessibility) }
+                title = "Usage access",
+                done = setup.usageAccess,
+                body = "Needed for limits and grayscale, so Stillpoint knows which app is open. Find Stillpoint in the list and allow it.",
+            ) { TextAction("Open usage access settings", onOpenUsageAccess) }
         }
         item {
             SetupStep(
                 number = 2,
-                title = "Grayscale permission",
+                title = "Stop screen",
+                done = setup.canShowStopScreen,
+                body = "Lets the stop screen open when a limit runs out. Allow Display over other apps for Stillpoint.",
+            ) { TextAction("Open display over other apps", onOpenDisplayOver) }
+        }
+        item {
+            SetupStep(
+                number = 3,
+                title = "Grayscale permission (optional)",
                 done = setup.grayscaleAllowed,
-                body = "Android only gives this over USB, once. On OnePlus, Oppo and Realme, first turn on Disable permission monitoring in Developer options and restart. Then run this on a computer:",
+                body = "Only for grayscale. Android only gives this over USB, once. On OnePlus, Oppo and Realme, first turn on Disable permission monitoring in Developer options and restart. Then run this on a computer:",
             ) {
                 Text(
                     GRANT_COMMAND,
@@ -90,15 +100,15 @@ fun SettingsScreen(
             }
         }
         item {
-            val finished = setup.serviceOn && setup.grayscaleAllowed
+            val finished = setup.usageAccess && setup.canShowStopScreen && setup.grayscaleAllowed
             SetupStep(
-                number = 3,
+                number = 4,
                 title = "Turn Developer options off",
                 done = !setup.developerOptionsOn,
                 body = if (finished) {
-                    "Steps 1 and 2 are done, so you can turn this off now. Doing so also closes the USB debugging connection."
+                    "The steps above are done, so you can turn this off now. Doing so also closes the USB debugging connection."
                 } else {
-                    "Do this last, after steps 1 and 2. It also closes the USB debugging connection."
+                    "Do this last. It also closes the USB debugging connection."
                 },
             ) {
                 if (finished) TextAction("Open developer options", onOpenDeveloperOptions)
@@ -168,7 +178,7 @@ fun SettingsScreen(
             Column(Modifier.padding(horizontal = PageGutter)) {
                 Fact("No internet", "Stillpoint doesn't have the internet permission, so Android stops it from sending or receiving anything.")
                 Fact("Stays on this phone", "Your limits and usage are stored only in this app, and are left out of backups.")
-                Fact("Knows only which app is open", "It can't read what's on your screen, what you type, or your messages.")
+                Fact("No accessibility access", "Stillpoint sees which apps you open and when, using Usage Access. It can't read what's on your screen, what you type, or your messages.")
                 Fact("One system setting", "It uses the grayscale permission only to switch the colour filter on and off.")
                 Fact("Easy to remove", "Uninstalling Stillpoint removes its permissions and data.")
                 Muted("Version $versionName", Modifier.padding(top = 20.dp, bottom = 28.dp))

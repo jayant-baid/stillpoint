@@ -27,12 +27,13 @@ import com.stillpoint.app.ui.PageGutter
 import com.stillpoint.app.ui.StillpointTheme
 
 /**
- * The full-screen stop page. It is an ordinary activity rather than an accessibility overlay,
- * because Android always draws those above the notification shade, which would hide the shade.
+ * The full-screen stop page. It is an ordinary activity rather than a window drawn over other
+ * apps, so the notification shade still opens on top of it.
  */
 class BlockActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        BlockGate.screenAlive = true
         enableEdgeToEdge()
         onBackPressedDispatcher.addCallback(this) { goHome() }
         setContent {
