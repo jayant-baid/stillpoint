@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A white disc with one sliver of signal colour: the app's whole idea in one mark. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FFF5F5F5"
+        android:pathData="M54,30 A24,24 0 1,0 78,54 L54,54 Z" />
+    <path
+        android:fillColor="#FFFF4A26"
+        android:pathData="M58,30.4 A24,24 0 0,1 77.6,50 L58,50 Z" />
+</vector>
